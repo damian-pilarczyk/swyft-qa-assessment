@@ -38,7 +38,7 @@
         if(!r.ok) throw new Error('REST failed ' + r.status)
         const j = await r.json()
         // INTENTIONAL BUG: unsafe assignment enables XSS from server description
-        elDesc.innerHTML = j.description
+        elDesc.textContent = j.description
         return j.points.map(p => p.v)
       }
 
