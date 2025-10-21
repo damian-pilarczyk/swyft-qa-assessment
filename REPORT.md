@@ -19,3 +19,16 @@ I haven’t worked with canvas before, so for the purpose of the test I decided 
 I don’t know why time mocking was mentioned, maybe it’s a bait :D But I don’t see any use for cy.clock() here. I would have to somehow pass the time value in the request body (after setting it to an odd minute), which would require changing the server code (`const now = req.query.time ? new Date(req.query.time) : Date.now()`) – and I don’t see a reason to do that just for testing purposes.
 
 In the case of the last test, it could be tricky to check whether an element that didn’t exist before still doesn’t exist. Unfortunately, waiting with `cy.wait(requestAlias)` is not sufficient, because rendering the element can take a few milliseconds after the request finishes – so `cy.get(xss).should("not.exist")` could give a false positive result. That’s why I decided to create the shouldPoll command with a safe timeout of 500ms (10 attempts every 50ms) - maybe it is a bit too safe.
+
+### Core B — Unit & Integration (Jest + TypeScript)
+
+I'm not exactly sure how such a moving average should work, but from the error descriptions I suppose it should work as follows:
+window 3, array [1, 2, 3, 4, 5]
+[1] -> 1
+[1, 2] -> 1.5
+[1, 2, 3] -> 2
+[2, 3, 4] -> 3
+[3, 4, 5] -> 4
+so the result is [1, 1.5, 2, 3, 4]
+I've also added tests for combinations of different positive, negative, and zero values that check the function against this logic.
+I've also added tests checking error handling when the window is less or equal 0 or when NaN appears in the input array.
