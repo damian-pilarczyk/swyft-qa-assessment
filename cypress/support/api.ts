@@ -1,6 +1,6 @@
-const metricUrlBase = '/api/metrics?metric=';
 const name = (param: string) => `get${param}Metrics`;
 const alias = (param: string) => `@${name(param)}`;
+export const metricUrlBase = '/api/metrics?metric=';
 
 export const api = {
     getLatencyMetrics: {

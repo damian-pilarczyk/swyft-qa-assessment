@@ -32,3 +32,9 @@ window 3, array [1, 2, 3, 4, 5]
 so the result is [1, 1.5, 2, 3, 4]
 I've also added tests for combinations of different positive, negative, and zero values that check the function against this logic.
 I've also added tests checking error handling when the window is less or equal 0 or when NaN appears in the input array.
+
+### Core C — API Testing
+
+I added protection to server.js so that the server can only accept metric values 'download', 'upload' or 'latency'. This is also additional protection against XSS. I removed the if statement that returned 500 for 'upload' and odd minutes.
+I also noticed that my changes caused a "Cannot read properties of null (reading 'kpi')" error appearing on the frontend - I fixed it by changing the if in fetchGraphQL from `if(!r.ok)` to `if(!r.ok || !j.data)` - r.ok returns true if the server is running and there's no schema error, regardless of whether an exception was thrown in the server code.
+Regarding tests, I added 3 for REST and GraphQL checking each metric (with expected generated in the same way as request handlers) and one with an invalid metric name. Since REST API and GraphQL handle responses differently, the expects differ slightly.

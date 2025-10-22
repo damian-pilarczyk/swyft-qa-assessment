@@ -1,10 +1,10 @@
 
+import { ApolloServer, gql } from 'apollo-server'
+import bodyParser from 'body-parser'
 import express from 'express'
+import fetch from 'node-fetch'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import bodyParser from 'body-parser'
-import fetch from 'node-fetch'
-import { ApolloServer, gql } from 'apollo-server'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -14,12 +14,8 @@ app.use(bodyParser.json())
 // --- Mock REST API ---
 app.get('/api/metrics', (req, res) => {
   const metric = (req.query.metric || 'download').toString()
-  const now = Date.now()
-  // Intermittent 500 bug: returns 500 for 'upload' on odd minutes
-  const minute = new Date(now).getMinutes()
-  if (metric === 'upload' && minute % 2 === 1) {
-    console.error('Intermittent failure triggered for upload on odd minute', minute)
-    return res.status(500).json({ error: 'Intermittent failure' })
+  if(!['download', 'upload', 'latency'].includes(metric)) {
+    return res.status(400).json({ error: 'Invalid metric' })
   }
   const data = Array.from({ length: 12 }).map((_, i) => ({
     t: i,
@@ -37,6 +33,9 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     kpi: (_, { metric }) => {
+      if(!['download', 'upload', 'latency'].includes(metric)) {
+        throw new Error('Invalid metric')
+      }
       return Array.from({ length: 12 }).map((_, i) => ({
         t: i,
         v: metric === 'download' ? 50 + i * 3 : metric === 'upload' ? 20 + i * 2 : 30 + (i % 5)
