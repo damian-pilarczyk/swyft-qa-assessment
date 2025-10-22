@@ -38,3 +38,39 @@ I've also added tests checking error handling when the window is less or equal 0
 I added protection to server.js so that the server can only accept metric values 'download', 'upload' or 'latency'. This is also additional protection against XSS. I removed the if statement that returned 500 for 'upload' and odd minutes.
 I also noticed that my changes caused a "Cannot read properties of null (reading 'kpi')" error appearing on the frontend - I fixed it by changing the if in fetchGraphQL from `if(!r.ok)` to `if(!r.ok || !j.data)` - r.ok returns true if the server is running and there's no schema error, regardless of whether an exception was thrown in the server code.
 Regarding tests, I added 3 for REST and GraphQL checking each metric (with expected generated in the same way as request handlers) and one with an invalid metric name. Since REST API and GraphQL handle responses differently, the expects differ slightly.
+
+### Stretch Goals (Optional)
+
+#### Performance
+
+I have no experience with performance testing, I ran Lighthouse, and the results are:
+
+- Performance 100
+- Accessibility 88
+- Best Practices 100
+- SEO 90
+
+conclusions:
+
+- disable unnecessary GraphQL requests (this code can be fully removed)
+- use caching if the user selects the same metric again
+- increase accessibility by adding a `lang` attribute
+
+#### SQL Reasoning
+
+As there is no database in this repository, I'm unable to do that
+
+#### Security
+
+Explained in Core A nad Core C
+
+#### AI Testing (Bonus Thought Exercise)
+
+Let's define True Positives, False Positives, False Negatives and True Negatives
+TP - LLM correctly explains the chart (valid chart - correct explanation)
+FP - LLM incorrectly explains the chart (valid or invalid chart - incorrect explanation)
+FN - LLM fails to explain the chart, but it should be able to do that (valid chart - no explanation)
+TN - LLM fails to explain the chart, and it shouldn't be able to do that (invalid chart - no explanation)
+Based on that we can ask LLM to explain dozens of valid and invalid charts and calculate the metrics such as precision, accuracy, recall(TPR), FPR, F1 Score and evaluate how well our LLM performs.
+If LLM can return how confident it is about the answer, then we can also create the ROC curve and calculate the area under it to evaluate how good the model’s answers are at different confidence levels. Then we can calculate distance from every point to the point (0,1) and set the confidence level for the point with the shortest distance.
+We can also automate those tests, the expected results can be stored in the text or json files (LLM answers e.g. "This chart shows how the latency is changing in a time") and ask the same or another LLM to assert if the answer is similar to the expected one.
